@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/marciogameiro/cmgdb_utils",
     package_dir={'':'src'},
-    packages=setuptools.find_packages(),
+    packages=['cmgdb_utils'],
     install_requires=["CMGDB", "pyCHomP2"],
     classifiers=[
         "Programming Language :: Python :: 3",
