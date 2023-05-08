@@ -1,2 +1,2 @@
-# pychomp_utils
-pyCHomP utilities
+# cmgdb_utils
+CMGDB utilities
