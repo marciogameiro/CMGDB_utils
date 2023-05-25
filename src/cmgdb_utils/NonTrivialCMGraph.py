@@ -55,7 +55,7 @@ def NonTrivialCMGraphPyChomP(morse_graph):
     label = morse_graph.vertex_label(v)
     D = len(label.split(','))
     # Check if a Morse node is trivial
-    trivial = lambda v: morse_graph.vertex_label(v) == ['0']*D
+    trivial = lambda v: morse_graph.vertex_label(v) == str((0,)*D)
     # Nontrivial Morse nodes
     non_trivial_nodes = [v for v in morse_graph.vertices() if not trivial(v)]
     # Construct nontrivial Conley Morse graph
