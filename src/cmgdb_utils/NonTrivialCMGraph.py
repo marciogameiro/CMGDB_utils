@@ -4,7 +4,7 @@
 # MIT LICENSE
 
 import CMGDB
-import pychomp2 as pychomp
+import pychomp
 import pydot
 
 def NonTrivialCMGraph(morse_graph):
