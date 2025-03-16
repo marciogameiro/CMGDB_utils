@@ -1,2 +1,3 @@
-# cmgdb_utils
+# CMGDB_utils
+
 CMGDB utilities
