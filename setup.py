@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="CMGDB_utils",
-    version="0.0.1",
+    version="0.0.2",
     author="Marcio Gameiro",
     author_email="marciogameiro@gmail.com",
     description="CMGDB utilities",
@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/marciogameiro/CMGDB_utils",
     package_dir={'':'src'},
     packages=['CMGDB_utils'],
-    install_requires=["CMGDB", "pyCHomP2"],
+    install_requires=["DSGRN", "pyCHomP2"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
