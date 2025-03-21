@@ -4,7 +4,6 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import CMGDB
 
 def PlotMorseSets(morse_graph, morse_decomp, vertex_mapping, cubical_complex, morse_nodes=None,
                   proj_dims=None, cmap=None, clist=None, fig_w=8, fig_h=8, xlim=None, ylim=None,
