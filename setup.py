@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="CMGDB_utils",
-    version="0.0.2",
+    version="1.0.0",
     author="Marcio Gameiro",
     author_email="marciogameiro@gmail.com",
     description="CMGDB utilities",
