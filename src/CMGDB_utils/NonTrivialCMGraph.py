@@ -3,7 +3,6 @@
 # 2023-05-25
 # MIT LICENSE
 
-import CMGDB
 import pychomp
 import pydot
 
