@@ -52,6 +52,7 @@ def ComputeMorseGraph(model):
     # Construct the Morse graph and add edges
     morse_graph = pychomp.DirectedAcyclicGraph()
     for u in range(num_nodes):
+        morse_graph.add_vertex(vertex_mapping[u])
         for v in morse_decomp.poset().children(u):
             morse_graph.add_edge(vertex_mapping[u], vertex_mapping[v])
     return morse_graph, morse_decomp, vertex_mapping, cubical_complex
