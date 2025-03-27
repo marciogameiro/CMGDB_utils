@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/marciogameiro/CMGDB_utils",
     package_dir={'':'src'},
     packages=['CMGDB_utils'],
-    install_requires=["DSGRN", "pyCHomP2"],
+    install_requires=["DSGRN"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

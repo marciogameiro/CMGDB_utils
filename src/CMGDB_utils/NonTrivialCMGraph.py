@@ -3,12 +3,12 @@
 # 2023-05-25
 # MIT LICENSE
 
-import pychomp
+import CMGDB_utils
 import pydot
 
 def NonTrivialCMGraph(morse_graph):
     # Make a pyChomP graph from morse_graph
-    G = pychomp.DirectedAcyclicGraph()
+    G = DirectedAcyclicGraph()
     for v in morse_graph.vertices():
         G.add_vertex(v)
     for v in morse_graph.vertices():
@@ -21,7 +21,7 @@ def NonTrivialCMGraph(morse_graph):
     # Nontrivial Morse nodes
     non_trivial_nodes = [v for v in morse_graph.vertices() if not trivial(v)]
     # Construct nontrivial Conley Morse graph
-    non_trivial_cmg = pychomp.DirectedAcyclicGraph()
+    non_trivial_cmg = CMGDB_utils.DirectedAcyclicGraph()
     for v in non_trivial_nodes:
         label = '(' + ', '.join(morse_graph.annotations(v)) + ')'
         # label = str(v) + ' : (' + ', '.join(morse_graph.annotations(v)) + ')'
@@ -43,7 +43,7 @@ def NonTrivialCMGraph(morse_graph):
 
 def NonTrivialCMGraphPyChomP(morse_graph):
     # Make a pyChomP graph from morse_graph
-    G = pychomp.DirectedAcyclicGraph()
+    G = CMGDB_utils.DirectedAcyclicGraph()
     for v in morse_graph.vertices():
         G.add_vertex(v)
     for v in morse_graph.vertices():
@@ -58,7 +58,7 @@ def NonTrivialCMGraphPyChomP(morse_graph):
     # Nontrivial Morse nodes
     non_trivial_nodes = [v for v in morse_graph.vertices() if not trivial(v)]
     # Construct nontrivial Conley Morse graph
-    non_trivial_cmg = pychomp.DirectedAcyclicGraph()
+    non_trivial_cmg = CMGDB_utils.DirectedAcyclicGraph()
     for v in non_trivial_nodes:
         label = morse_graph.vertex_label(v)
         non_trivial_cmg.add_vertex(v, label=label)
@@ -83,7 +83,7 @@ def graph_from_dotfile(dot_fname):
     # Assuming there is only one graph
     dot_graph = dot_graphs[0]
     # Create a pyChomP graph from dot_graph
-    G = pychomp.DirectedAcyclicGraph()
+    G = CMGDB_utils.DirectedAcyclicGraph()
     for node in dot_graph.get_nodes():
         name = node.get_name()
         label = node.get_label()

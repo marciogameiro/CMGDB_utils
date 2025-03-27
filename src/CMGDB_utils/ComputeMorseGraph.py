@@ -2,7 +2,6 @@
 ### MIT LICENSE 2025 Marcio Gameiro
 
 import DSGRN
-import pychomp
 import CMGDB_utils
 
 def compute_multivalued_map(cubical_complex, model):
@@ -50,7 +49,7 @@ def ComputeMorseGraph(model):
     # Create an indexing of the Morse graph vertices
     vertex_mapping = {v: num_nodes - 1 - v for v in range(num_nodes)}
     # Construct the Morse graph and add edges
-    morse_graph = pychomp.DirectedAcyclicGraph()
+    morse_graph = CMGDB_utils.DirectedAcyclicGraph()
     for u in range(num_nodes):
         morse_graph.add_vertex(vertex_mapping[u])
         for v in morse_decomp.poset().children(u):
