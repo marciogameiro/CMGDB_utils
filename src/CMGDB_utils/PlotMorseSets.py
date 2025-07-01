@@ -5,9 +5,11 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-def PlotMorseSets(morse_graph, morse_decomp, vertex_mapping, cubical_complex, morse_nodes=None,
-                  proj_dims=None, cmap=None, clist=None, fig_w=8, fig_h=8, xlim=None, ylim=None,
-                  axis_labels=True, xlabel='$x$', ylabel='$y$', fontsize=15, fig_fname=None, dpi=300):
+def PlotMorseSets(morse_graph_data, cubical_complex, morse_nodes=None, proj_dims=None, cmap=None,
+                  clist=None, fig_w=8, fig_h=8, xlim=None, ylim=None, axis_labels=True, xlabel='$x$',
+                  ylabel='$y$', fontsize=15, fig_fname=None, dpi=300):
+    # Get Morse graph data components
+    morse_graph, morse_decomp, vertex_mapping = morse_graph_data
     # Number of Morse sets
     num_morse_sets = len(morse_graph.vertices())
     # Get list of Morse sets boxes
