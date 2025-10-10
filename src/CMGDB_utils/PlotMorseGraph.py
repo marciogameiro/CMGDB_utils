@@ -6,12 +6,13 @@ import matplotlib
 import matplotlib.pyplot as plt
 import graphviz
 
-def PlotMorseGraph(morse_graph_data, cmap=None, clist=None, shape=None, margin=None):
+def PlotMorseGraph(mg_data, cmap=None, clist=None, shape=None, margin=None):
     """Plot Morse graph using cmap as the colormap or clist as a list of colors to make a colormap."""
     # Default colormap
     default_cmap = matplotlib.cm.tab20
-    # Get the Morse graph
-    morse_graph = morse_graph_data[0]
+    # Get the Morse graph from mg_data, which can be a tuple
+    # (morse_graph, morse_decomp, vertex_mapping) or just morse_graph
+    morse_graph = mg_data[0] if isinstance(mg_data, tuple) else mg_data
     # Number of vertices
     num_verts = len(morse_graph.vertices())
     # Set defaults for unset values

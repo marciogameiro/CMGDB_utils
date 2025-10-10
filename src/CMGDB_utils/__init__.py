@@ -15,5 +15,6 @@ from CMGDB_utils.BoxMapData import *
 from CMGDB_utils.PlotMorseGraph import *
 from CMGDB_utils.PlotMorseSets import *
 from CMGDB_utils.DirectedAcyclicGraph import *
+from CMGDB_utils.LatticeAttractors import *
 
 # __all__ = ['NonTrivialCMGraph', 'NonTrivialCMGraphPyChomP', 'graph_from_dotfile']
