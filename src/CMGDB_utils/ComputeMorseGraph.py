@@ -14,7 +14,7 @@ def compute_multivalued_map(cubical_complex, model):
     # Just assign the edges if multi-valued map is given
     if model.map_type == 'GraphMap' or model.map_type == 'G':
         for u in range(num_verts):
-            adjacencies = model.F(u)
+            adjacencies = model.F[u]
             for v in adjacencies:
                 digraph.add_edge(u, v)
         return digraph
