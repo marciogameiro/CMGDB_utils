@@ -4,6 +4,30 @@
 import CMGDB_utils
 import collections
 
+def attractor_max_node(v, attractor, morse_graph):
+    """Check if v is a maximal node in attractor"""
+    for u in attractor:
+        if u != v and v in morse_graph.adjacencies(u):
+            return False
+    return True
+
+def attractor_type(attractor, morse_graph):
+    """Get type of attarctor"""
+    # Get phase space dimension
+    dim = len(morse_graph.vertex_label(0)[1:-1].split(',')) - 1
+    # Get attractor maximal nodes
+    att_maximal_nodes = [v for v in attractor if attractor_max_node(v, attractor, morse_graph)]
+    # Check for trivial Conley index
+    for v in att_maximal_nodes:
+        # Type 0 if trivial Conley index
+        if morse_graph.vertex_label(v) == str((0,)*(dim + 1)):
+            return 0
+    # Type 2 if downset of a single node
+    if len(att_maximal_nodes) == 1:
+        return 2
+    # Type 1 if downset of multiple nodes
+    return 1
+
 def morse_graph_from_edges(edges, grid_size):
     """Compute Morse graph from list of edges"""
     # Define multi-valued map from list of edges
@@ -40,7 +64,17 @@ def lattice_attractors_from_mvm(edges, grid_size):
     att_edges = latt_attractors.edges()
     gv_graph = CMGDB_utils.PlotGraph(latt_attractors)
     att_gv_str = str(gv_graph)
-    return att_vertices, att_edges, att_labels, att_gv_str
+    # Get attractor types
+    att_types = [0]
+    for v in att_vertices:
+        att_str = latt_attractors.vertex_label(v)
+        # Skip trivial attractor
+        if att_str == '{ }':
+            continue
+        attractor = [int(v.strip()) for v in att_str[1:-1].split(',')]
+        att_type = attractor_type(attractor, morse_graph)
+        att_types.append(att_type)
+    return att_vertices, att_edges, att_labels, att_gv_str, att_types
 
 def lattice_repellers_from_mvm(edges, grid_size):
     """Compute lattice of repellers from list of edges (mvm)"""
