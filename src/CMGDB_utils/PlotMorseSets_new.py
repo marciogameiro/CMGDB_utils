@@ -1,23 +1,62 @@
-### PlotMorseSets.py
-### MIT LICENSE 2025 Marcio Gameiro
+# PlotMorseSets.py
+# Marcio Gameiro
+# MIT LICENSE
+# 2023-07-15
 
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import CMGDB
 
-def PlotMorseSets(morse_graph_data, cubical_complex, morse_nodes=None, proj_dims=None, cmap=None,
-                  clist=None, fig_w=8, fig_h=8, xlim=None, ylim=None, axis_labels=True, xlabel='$x$',
-                  ylabel='$y$', fontsize=15, fig_fname=None, dpi=300):
+def PlotMorseSets_new(morse_sets, morse_nodes=None, proj_dims=None, cmap=None, clist=None,
+                  scale_factor=None, fig_w=8, fig_h=8, xlim=None, ylim=None, axis_labels=True,
+                  xlabel='$x$', ylabel='$y$', fontsize=15, fig_fname=None, dpi=300):
+    # Check if morse_sets is a Morse graph, file name, or list
+    if type(morse_sets) == CMGDB._cmgdb.MorseGraph: # Morse graph
+        morse_graph = morse_sets
+        num_morse_sets = morse_graph.num_vertices()
+        if morse_nodes == None:
+            morse_nodes = range(num_morse_sets)
+        morse_sets = [box + [node] for node in morse_nodes for box in morse_graph.morse_set_boxes(node)]
+    elif type(morse_sets) == str: # String representing file name
+        morse_fname = morse_sets
+        morse_sets = CMGDB.LoadMorseSetFile(morse_fname)
+        num_morse_sets = None
+    else: # List of Morse sets
+        num_morse_sets = None
+    # Plot Morse set boxes as a scatter plot
+    PlotBoxesScatter_new(morse_sets, num_morse_sets=num_morse_sets, morse_nodes=morse_nodes,
+                     scale_factor=scale_factor, proj_dims=proj_dims, cmap=cmap, clist=clist, fig_w=fig_w, fig_h=fig_h,
+                     xlim=xlim, ylim=ylim, axis_labels=axis_labels, xlabel=xlabel,
+                     ylabel=ylabel, fontsize=fontsize, fig_fname=fig_fname, dpi=dpi)
+
+def PlotBoxesScatter_new(morse_sets, num_morse_sets=None, morse_nodes=None, proj_dims=None, cmap=None,
+                     scale_factor=None, clist=None, fig_w=8, fig_h=8, xlim=None, ylim=None, axis_labels=True,
+                     xlabel='$x$', ylabel='$y$', fontsize=15, fig_fname=None, dpi=300):
     # Default color list
     default_clist = ['#1f77b4', '#e6550d', '#31a354', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
                      '#bcbd22', '#80b1d3', '#ffffb3', '#fccde5', '#b3de69', '#fdae6b', '#6a3d9a', '#c49c94',
                      '#fb8072', '#dbdb8d', '#bc80bd', '#ffed6f', '#637939', '#c5b0d5', '#636363', '#c7c7c7',
                      '#8dd3c7', '#b15928', '#e8cb32', '#9e9ac8', '#74c476', '#ff7f0e', '#9edae5', '#90d743',
                      '#e7969c', '#17becf', '#7b4173', '#8ca252', '#ad494a', '#8c6d31', '#a55194', '#00cc49']
-    # Get Morse graph data components
-    morse_graph, morse_decomp, vertex_mapping = morse_graph_data
-    # Number of Morse sets
-    num_morse_sets = len(morse_graph.vertices())
+    # # Default colormap
+    # default_cmap = matplotlib.cm.tab20
+    rect = morse_sets[0]
+    assert len(rect) % 2 == 1, "Wrong dimension in Morse sets data"
+    dim = int((len(rect) - 1) / 2)
+    if dim == 1:
+        # Add extra fake dimension to plot
+        x0_min, x0_max, node = morse_sets[0]
+        x1_min = 0
+        x1_max = x0_max - x0_min
+        morse_sets = [[x0_min, x1_min, x0_max, x1_max, node] for x0_min, x0_max, node in morse_sets]
+        dim = 2
+    if num_morse_sets == None:
+        num_morse_sets = max([int(rect[-1]) for rect in morse_sets]) + 1
+    if morse_nodes == None:
+        morse_nodes = range(num_morse_sets)
+    if scale_factor == None:
+        scale_factor = [1]*num_morse_sets
     # Set colormap for Morse sets
     if cmap == None and clist == None:
         clist = default_clist
@@ -35,33 +74,6 @@ def PlotMorseSets(morse_graph_data, cubical_complex, morse_nodes=None, proj_dims
     else:
         # Normalization for color map
         cmap_norm = matplotlib.colors.Normalize(vmin=0, vmax=num_morse_sets-1)
-    # Get list of Morse sets boxes
-    morse_sets = []
-    for n in range(num_morse_sets):
-        # Get corresponding Morse node
-        morse_node = vertex_mapping[n]
-        # Get cells in Morse decomposition node
-        morse_set = morse_decomp.morseset(n)
-        for index in morse_set:
-            # Get min and max vertices of cube
-            min_vert = cubical_complex.min_vertex(index)
-            max_vert = cubical_complex.max_vertex(index)
-            # Add Morse set box to list of Morse sets
-            morse_sets.append(min_vert + max_vert + [morse_node])
-    # # Default colormap
-    # default_cmap = matplotlib.cm.tab20
-    rect = morse_sets[0]
-    assert len(rect) % 2 == 1, "Wrong dimension in Morse sets data"
-    dim = int((len(rect) - 1) / 2)
-    if dim == 1:
-        # Add extra fake dimension to plot
-        x0_min, x0_max, node = morse_sets[0]
-        x1_min = 0
-        x1_max = x0_max - x0_min
-        morse_sets = [[x0_min, x1_min, x0_max, x1_max, node] for x0_min, x0_max, node in morse_sets]
-        dim = 2
-    if morse_nodes == None:
-        morse_nodes = range(num_morse_sets)
     if proj_dims == None:
         d1 = 0
         d2 = 1
@@ -121,8 +133,8 @@ def PlotMorseSets(morse_graph_data, cubical_complex, morse_nodes=None, proj_dims
             p2 = [rect[dim + d1], rect[dim + d2]]       # Upper point
             p = list((np.array(p1) + np.array(p2)) / 2) # Center point
             s = list((np.array(p2) - np.array(p1)))     # Rect size
-            s_x = (s0_x * s[0]) ** 2 # Scatter x-axis size
-            s_y = (s0_y * s[1]) ** 2 # Scatter y-axis size
+            s_x = (scale_factor[morse_node] * s0_x * s[0]) ** 2 # Scatter x-axis size
+            s_y = (scale_factor[morse_node] * s0_y * s[1]) ** 2 # Scatter y-axis size
             # Alternative way to set marker size in data units
             # s_x = (x_scale * s[0]) ** 2 # Scatter x-axis size
             # s_y = (y_scale * s[1]) ** 2 # Scatter y-axis size
