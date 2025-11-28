@@ -46,6 +46,12 @@ def PlotMorseGraph_new(morse_graph, cmap=None, clist=None, shape=None, margin=No
         cmap_norm = matplotlib.colors.Normalize(vmin=0, vmax=num_verts-1)
     # Get list of attractors (nodes without children)
     attractors = [v for v in morse_graph.vertices() if len(morse_graph.adjacencies(v)) == 0]
+    # Get set of children nodes (nodes with a parent)
+    children_nodes = set()
+    for v in morse_graph.vertices():
+        children_nodes.update(morse_graph.adjacencies(v))
+    # Get list of repellers (nodes without parents)
+    repellers = list(set(morse_graph.vertices()).difference(children_nodes))
 
     def graphviz_string(graph):
         # Return graphviz string describing the graph
@@ -73,6 +79,12 @@ def PlotMorseGraph_new(morse_graph, cmap=None, clist=None, shape=None, margin=No
         # Set rank for attractors
         gv += '{rank=same; '
         for v in attractors:
+            gv += str(v) + ' '
+        gv += '}; \n'
+
+        # Set rank for repellers
+        gv += '{rank=same; '
+        for v in repellers:
             gv += str(v) + ' '
         gv += '}; \n'
 
