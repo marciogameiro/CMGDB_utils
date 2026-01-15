@@ -1,23 +1,45 @@
 ### PlotMorseSets.py
 ### MIT LICENSE 2025 Marcio Gameiro
 
+import CMGDB_utils
+
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-def PlotMorseSets(morse_graph_data, cubical_complex, morse_nodes=None, proj_dims=None, cmap=None,
-                  clist=None, fig_w=8, fig_h=8, xlim=None, ylim=None, axis_labels=True, xlabel='$x$',
-                  ylabel='$y$', fontsize=15, fig_fname=None, dpi=300):
+def PlotMorseSets(morse_graph_data, cubical_complex=None, morse_nodes=None, proj_dims=None,
+                  cmap=None, clist=None, fig_w=8, fig_h=8, xlim=None, ylim=None, axis_labels=True,
+                  xlabel='$x$', ylabel='$y$', fontsize=15, fig_fname=None, dpi=300):
     # Default color list
     default_clist = ['#1f77b4', '#e6550d', '#31a354', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
                      '#bcbd22', '#80b1d3', '#ffffb3', '#fccde5', '#b3de69', '#fdae6b', '#6a3d9a', '#c49c94',
                      '#fb8072', '#dbdb8d', '#bc80bd', '#ffed6f', '#637939', '#c5b0d5', '#636363', '#c7c7c7',
                      '#8dd3c7', '#b15928', '#e8cb32', '#9e9ac8', '#74c476', '#ff7f0e', '#9edae5', '#90d743',
                      '#e7969c', '#17becf', '#7b4173', '#8ca252', '#ad494a', '#8c6d31', '#a55194', '#00cc49']
-    # Get Morse graph data components
-    morse_graph, morse_decomp, vertex_mapping = morse_graph_data
-    # Number of Morse sets
-    num_morse_sets = len(morse_graph.vertices())
+    # Get list of Morse sets boxes
+    if isinstance(morse_graph_data, str): # String giving file name
+        morse_fname = morse_graph_data
+        morse_sets = CMGDB_utils.LoadMorseSetFile(morse_fname)
+        # Number of Morse sets
+        num_morse_sets = max([int(rect[-1]) for rect in morse_sets]) + 1
+    else:
+        # Get Morse graph data components
+        morse_graph, morse_decomp, vertex_mapping = morse_graph_data
+        # Number of Morse sets
+        num_morse_sets = len(morse_graph.vertices())
+        # Get list of Morse sets boxes
+        morse_sets = []
+        for n in range(num_morse_sets):
+            # Get corresponding Morse node
+            morse_node = vertex_mapping[n]
+            # Get cells in Morse decomposition node
+            morse_set = morse_decomp.morseset(n)
+            for index in morse_set:
+                # Get min and max vertices of cube
+                min_vert = cubical_complex.min_vertex(index)
+                max_vert = cubical_complex.max_vertex(index)
+                # Add Morse set box to list of Morse sets
+                morse_sets.append(min_vert + max_vert + [morse_node])
     # Set colormap for Morse sets
     if cmap == None and clist == None:
         clist = default_clist
@@ -35,19 +57,6 @@ def PlotMorseSets(morse_graph_data, cubical_complex, morse_nodes=None, proj_dims
     else:
         # Normalization for color map
         cmap_norm = matplotlib.colors.Normalize(vmin=0, vmax=num_morse_sets-1)
-    # Get list of Morse sets boxes
-    morse_sets = []
-    for n in range(num_morse_sets):
-        # Get corresponding Morse node
-        morse_node = vertex_mapping[n]
-        # Get cells in Morse decomposition node
-        morse_set = morse_decomp.morseset(n)
-        for index in morse_set:
-            # Get min and max vertices of cube
-            min_vert = cubical_complex.min_vertex(index)
-            max_vert = cubical_complex.max_vertex(index)
-            # Add Morse set box to list of Morse sets
-            morse_sets.append(min_vert + max_vert + [morse_node])
     # # Default colormap
     # default_cmap = matplotlib.cm.tab20
     rect = morse_sets[0]

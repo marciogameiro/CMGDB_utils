@@ -17,6 +17,7 @@ from CMGDB_utils.PlotMorseSets import *
 from CMGDB_utils.DirectedAcyclicGraph import *
 from CMGDB_utils.LatticeAttractors import *
 from CMGDB_utils.PlotGraph import *
+from CMGDB_utils.SaveMorseSets import *
 
 from CMGDB_utils.PlotMorseGraph_new import *
 from CMGDB_utils.PlotMorseSets_new import *
