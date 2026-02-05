@@ -30,6 +30,11 @@ def SamplePoints(lower_bounds, upper_bounds, num_pts):
 
 def BoxMap(f, box, mode='corners', num_pts=10):
     """Return a rectangle containing the image of the input rectangle"""
+    f_box, X = BoxMapSample(f, box, mode=mode, num_pts=num_pts)
+    return f_box
+
+def BoxMapSample(f, box, mode='random', num_pts=100):
+    """Return a rectangle containing the image of the input rectangle"""
     dim = int(len(box) / 2)
     if mode == 'corners': # Compute at corner points
         X = CornerPoints(box)
@@ -42,14 +47,17 @@ def BoxMap(f, box, mode='corners', num_pts=10):
         upper_bounds = box[dim:]
         X = SamplePoints(lower_bounds, upper_bounds, num_pts)
     else: # Unknown mode
-        return []
+        return [], []
     # Evaluate f at points in X
     Y = [f(x) for x in X]
     # Get lower and upper bounds of Y
     Y_l_bounds = [min([y[d] for y in Y]) for d in range(dim)]
     Y_u_bounds = [max([y[d] for y in Y]) for d in range(dim)]
     f_box = Y_l_bounds + Y_u_bounds
-    return f_box
+    # Return X if mode = 'random'
+    if mode == 'random':
+        return f_box, X
+    return f_box, []
 
 def MultiBoxMap(f, box, box_size=None, mode='corners', num_pts=10):
     """Return a list of rectangles containing the images of points in the input rectangle"""
