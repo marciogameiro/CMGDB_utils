@@ -25,5 +25,5 @@ from CMGDB_utils.PlotMorseGraph_new import *
 from CMGDB_utils.PlotMorseSets_new import *
 
 from CMGDB_utils.compute_morse_graph_from_mvm import *
-
+from CMGDB_utils.MarkovContraction import *
 # __all__ = ['NonTrivialCMGraph', 'NonTrivialCMGraphPyChomP', 'graph_from_dotfile']
