@@ -78,10 +78,13 @@ def ComputeConleyMorseGraph(model, acyclic_check=True):
         # Get corresponding Morse node
         morse_node = vertex_mapping[v]
         morse_set = set(morse_decomp.morseset(v))
+        # S subset F(S) for a Morse set. So X = F(S)
+        # X_cells = set(morse_set)
         X_cells = set()
         for u in morse_set:
             X_cells.update(digraph.adjacencies(u))
-        F = {u: digraph.adjacencies(u) for u in X_cells}
+        # Define multivalued map F restricted to X
+        F = {u: [w for w in digraph.adjacencies(u) if w in X_cells] for u in X_cells}
         A = list(X_cells - morse_set)
         X = list(X_cells)
         conley_index = CMGDB.ComputeConleyIndex(X, A, model.grid_size, model.periodic, F, acyclic_check)
