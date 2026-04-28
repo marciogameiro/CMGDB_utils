@@ -6,6 +6,7 @@ import DSGRN
 import CMGDB
 
 import matplotlib.pyplot as plt
+import matplotlib
 from collections import defaultdict
 import numpy as np
 import scipy
@@ -138,14 +139,96 @@ def attractor_eigenvalues(W, morse_graph_data, latt_attractors, att_vert, num_ev
     else:
         # Compute only some eigenvalues/eigenvecs
         eigen_vals, eigen_vecs = scipy.sparse.linalg.eigs(M.T, k=num_evals)
-    return eigen_vals, eigen_vecs, M
+    return eigen_vals, eigen_vecs, att_cell_index, M
 
-def plot_eigenvalues(eigs_complex, clr='b'):
-    fig, ax = plt.subplots()
+def eigenvectos_min_attractor(eigen_vals, eigen_vecs, max_att, mg_data, latt_att, att_cell_index, tol=1e-12):
+    """Return the minimal attractor containing support of eigenvectors"""
+    # Get list of cells on each attractor
+    morse_graph, morse_decomp, vertex_mapping = mg_data
+    attractor_cells = {}
+    # List of attractors below max_att (excluding 0)
+    att_vertices = sorted(latt_att.descendants(max_att) - {0})
+    # att_vertices = sorted(latt_att.vertices())
+    for v in att_vertices:
+        att_str = latt_att.vertex_label(v)
+        # Skip trivial attractor
+        if att_str == '{ }':
+            attractor_cells[v] = set()
+            continue
+        attractor = [int(v.strip()) for v in att_str[1:-1].split(',')]
+        att_cells = set()
+        for n in attractor:
+            # Get corresponding Morse node
+            morse_node = vertex_mapping[n]
+            # Get cells in Morse decomposition node
+            morse_set = morse_decomp.morseset(morse_node)
+            att_cells.update(morse_set)
+        attractor_cells[v] = att_cells
+    # Associate eigenvalues to minimal attractors
+    eigen_vecs_att = {}
+    for k in range(len(eigen_vals)):
+        # Get the k-th eigenvector
+        e_vec = eigen_vecs[:, k]
+        # Get non-zero entries of the eigenvector
+        e_vec_indices = set(np.where(abs(e_vec) > tol)[0])
+        # Find minimum attractor containing support of eigenvector
+        for v in att_vertices:
+            # Get list of row/column indices corresponding to attractor cells
+            att_indices = set([att_cell_index[c] for c in attractor_cells[v]])
+            # Associate the first attractor found (should be min)
+            if e_vec_indices.issubset(att_indices):
+                eigen_vecs_att[k] = v
+                break # Exit inner for loop
+    return eigen_vecs_att
+
+def plot_eigenvalues(e_vals, e_vecs, max_att, mg_data, latt_att, att_cell_index, cmap=None, clist=None, tol=1e-12):
+    """Plot eigenvalues colored according to minimum attractor"""
+    # List of markers for scatter plot
+    markers = ['s', 'D', 'o', '*', 'P', 'v', '^', '<', '>', 'p', 'X', 'h', 'H', '1', '2', '3', '4']
+    # Default color list
+    default_clist = ['#1f77b4', '#e6550d', '#31a354', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
+                     '#bcbd22', '#80b1d3', '#ffffb3', '#fccde5', '#b3de69', '#fdae6b', '#6a3d9a', '#c49c94',
+                     '#fb8072', '#dbdb8d', '#bc80bd', '#ffed6f', '#637939', '#c5b0d5', '#636363', '#c7c7c7',
+                     '#8dd3c7', '#b15928', '#e8cb32', '#9e9ac8', '#74c476', '#ff7f0e', '#9edae5', '#90d743',
+                     '#e7969c', '#17becf', '#7b4173', '#8ca252', '#ad494a', '#8c6d31', '#a55194', '#00cc49']
+    # # Default colormap
+    # default_cmap = matplotlib.cm.tab20
+    # Number of vertices
+    num_verts = len(latt_att.vertices())
+    # Set colormap for lattice
+    if cmap == None and clist == None:
+        clist = default_clist
+    if cmap == None:
+        cmap = matplotlib.colors.ListedColormap(clist[:num_verts])
+    # Get number of colors in the colormap
+    try:
+        # Colormap is listed colors colormap
+        num_colors = len(cmap.colors)
+    except:
+        num_colors = 0 # Colormap is "continuous"
+    if (num_colors > 0) and (num_colors < num_verts):
+        # Make colormap cyclic
+        cmap_norm = lambda k: k % num_colors
+    else:
+        # Normalization for color map
+        cmap_norm = matplotlib.colors.Normalize(vmin=0, vmax=num_verts-1)
+    # Get minimum attractor associated to each eigenvector
+    e_vecs_att = eigenvectos_min_attractor(e_vals, e_vecs, max_att, mg_data, latt_att, att_cell_index, tol=tol)
+    vert_color = lambda v: matplotlib.colors.to_hex(cmap(cmap_norm(v)), keep_alpha=True)
+    # colors = [vert_color(e_vecs_att[k]) for k in range(len(e_vals))]
+    fig, ax = plt.subplots(figsize=(10, 6))
     # Create a circle patch with center (0, 0) and radius 1
     circle = plt.Circle((0, 0), radius=1, color='black', fill=False)
     # Add the circle to the plot
     ax.add_patch(circle)
-    ax.plot(np.real(eigs_complex), np.imag(eigs_complex), 'o', color=clr)
-    ax.set_aspect('equal', adjustable='datalim')
+    # Plot eigenvalues corresponding to each attractor
+    for att in range(max_att + 1):
+        clr = vert_color(att)
+        m = markers[att]
+        e_vals_att = [e_vals[k] for k in range(len(e_vals)) if e_vecs_att[k] == att]
+        if e_vals_att:
+            ax.scatter(np.real(e_vals_att), np.imag(e_vals_att), c=clr, marker=m, s=45, label=f'Attractor: {att}')
+    ax.set_aspect('equal')
+    ax.legend(loc='upper left', fontsize='small')
+    plt.tight_layout()
     plt.show()
