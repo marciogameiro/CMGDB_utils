@@ -18,6 +18,7 @@ from CMGDB_utils.DirectedAcyclicGraph import *
 from CMGDB_utils.LatticeAttractors import *
 from CMGDB_utils.PlotGraph import *
 from CMGDB_utils.SaveMorseSets import *
+from CMGDB_utils.PlotLatticeAttractors import *
 
 from CMGDB_utils.AdjacencyMatrix import *
 
